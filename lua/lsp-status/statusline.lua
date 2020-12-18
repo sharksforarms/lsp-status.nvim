@@ -104,9 +104,56 @@ local function statusline_lsp()
   return symbol .. config.indicator_ok .. ' '
 end
 
+local function is_progress_done()
+  for _, client in ipairs(vim.lsp.get_active_clients()) do
+    local progress = client.messages.progress;
+    for key, msg in pairs(progress) do
+      if not msg.done and msg.percentage then
+        return false;
+      end
+    end
+  end
+
+  return true
+end
+
+local function statusline_spinner()
+  if #vim.lsp.buf_get_clients() == 0 then
+    return ''
+  end
+
+  --local buf_messages = messages()
+
+  local spinner_frame = ''
+  if is_progress_done() then
+    vim.g.spinnerz = 0;
+    vim.g.spinnerz_t = 0;
+  else
+    spinner_frame = config.spinner_frames[(vim.g.spinnerz % #config.spinner_frames) + 1]
+    if vim.g.spinnerz_t % 2 == 0 then
+      vim.g.spinnerz = vim.g.spinnerz + 1
+    end
+    vim.g.spinnerz_t = vim.g.spinnerz_t + 1
+  end
+
+  --local spinner_frame = ''
+  --for _, msg in ipairs(buf_messages) do
+      --if msg.spinner then
+        --spinner_frame = config.spinner_frames[(msg.spinner % #config.spinner_frames) + 1]
+      --end
+  --end
+
+  if spinner_frame ~= '' then
+    return spinner_frame
+  end
+
+  return config.indicator_ok
+end
+
 local M = {
   _init = init,
-  status = statusline_lsp
+  status = statusline_lsp,
+  status_spinner = statusline_spinner,
 }
 
 return M
