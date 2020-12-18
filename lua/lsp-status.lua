@@ -192,6 +192,7 @@ local M = {
   config = config,
   on_attach = on_attach,
   status = statusline.status,
+  status_spinner = statusline.status_spinner,
   capabilities = messaging.capabilities
 }
 

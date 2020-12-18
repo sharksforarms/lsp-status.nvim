@@ -104,9 +104,31 @@ local function statusline_lsp()
   return symbol .. config.indicator_ok .. ' '
 end
 
+local function statusline_spinner()
+  if #vim.lsp.buf_get_clients() == 0 then
+    return ''
+  end
+
+  local buf_messages = messages()
+
+  local spinner_frame = ''
+  for _, msg in ipairs(buf_messages) do
+      if msg.spinner then
+        spinner_frame = config.spinner_frames[(msg.spinner % #config.spinner_frames) + 1]
+      end
+  end
+
+  if spinner_frame ~= '' then
+    return spinner_frame
+  end
+
+  return config.indicator_ok
+end
+
 local M = {
   _init = init,
-  status = statusline_lsp
+  status = statusline_lsp,
+  status_spinner = statusline_spinner,
 }
 
 return M
